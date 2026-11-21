@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hisaab — the shop ledger that reminds</title>
+  <meta name="description" content="Hisaab is a simple digital ledger for a local shop. Track credit and payments, see every balance, and send a WhatsApp reminder in one tap.">
+  <meta name="theme-color" content="#0E5A43">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#/" aria-label="Hisaab home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3.5" y="2.5" width="17" height="19" rx="2"></rect>
+            <path d="M8 7.5h8M8 11.5h8M8 15.5h5"></path>
+            <circle cx="16.6" cy="17.4" r="1.1" fill="#F2A81D" stroke="none"></circle>
+          </svg>
+        </span>
+        <span class="brand-word">Hisaab</span>
+      </a>
+      <p class="shop-chip" id="shop-chip" title="Shop">My shop</p>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1"></main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p><strong>Hisaab</strong> — every credit and payment in one place.</p>
+      <p>Saved in this browser only. Amounts in Indian rupees.</p>
+    </div>
+  </footer>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <dialog class="dialog" id="customer-dialog" aria-labelledby="customer-dialog-title">
+    <form id="customer-form" novalidate>
+      <div class="dialog-head">
+        <div>
+          <h2 id="customer-dialog-title">Add a customer</h2>
+          <p class="dialog-sub">A name and a 10 digit phone number is all you need.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+
+      <div class="field">
+        <label for="customer-name">Name</label>
+        <input id="customer-name" name="name" type="text" autocomplete="off" maxlength="60" placeholder="Ravi Kumar" aria-describedby="customer-name-error">
+        <p class="field-error" id="customer-name-error" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="customer-phone">Phone number</label>
+        <input id="customer-phone" name="phone" type="tel" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="10 digit mobile number" aria-describedby="customer-phone-hint customer-phone-error">
+        <p class="hint" id="customer-phone-hint">10 digits, numbers only. Country code 91 is added for the WhatsApp reminder.</p>
+        <p class="field-error" id="customer-phone-error" role="alert"></p>
+      </div>
+
+      <p class="form-error" id="customer-form-error" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary">Add customer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="entry-dialog" aria-labelledby="entry-dialog-title">
+    <form id="entry-form" novalidate>
+      <div class="dialog-head">
+        <div>
+          <h2 id="entry-dialog-title">Add an entry</h2>
+          <p class="dialog-sub" id="entry-for">For this customer.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+
+      <fieldset class="field type-field">
+        <legend>Type</legend>
+        <div class="type-toggle">
+          <label class="type-option">
+            <input type="radio" name="type" value="credit" checked>
+            <span class="type-box"><span class="type-name">Credit</span><span class="type-note">Goods given</span></span>
+          </label>
+          <label class="type-option">
+            <input type="radio" name="type" value="payment">
+            <span class="type-box"><span class="type-name">Payment</span><span class="type-note">Money received</span></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="entry-amount">Amount (Rs)</label>
+          <input id="entry-amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="250" aria-describedby="entry-amount-error">
+          <p class="field-error" id="entry-amount-error" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="entry-date">Date</label>
+          <input id="entry-date" name="date" type="date" aria-describedby="entry-date-error">
+          <p class="field-error" id="entry-date-error" role="alert"></p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="entry-note">Note <span class="optional">(optional)</span></label>
+        <input id="entry-note" name="note" type="text" autocomplete="off" maxlength="120" placeholder="groceries" aria-describedby="entry-note-error">
+        <p class="field-error" id="entry-note-error" role="alert"></p>
+      </div>
+
+      <div class="field" id="image-field" hidden>
+        <span class="label-like">Payment screenshot <span class="optional">(optional)</span></span>
+        <div class="image-picker">
+          <label class="btn ghost image-pick-btn" for="entry-image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l.9-1.6h6.8l.9 1.6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z"></path><circle cx="12" cy="12.5" r="3.2"></circle></svg>
+            Choose picture
+          </label>
+          <input id="entry-image" name="image" type="file" accept="image/*" class="visually-hidden">
+          <p class="image-status" id="image-status">JPG or PNG. It is shrunk to fit this browser's storage.</p>
+        </div>
+        <div class="image-preview" id="image-preview" hidden>
+          <img id="image-preview-img" alt="Selected payment screenshot" width="72" height="72">
+          <button type="button" class="btn ghost small" id="image-remove">Remove picture</button>
+        </div>
+        <p class="field-error" id="entry-image-error" role="alert"></p>
+      </div>
+
+      <p class="form-error" id="entry-form-error" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary" id="entry-submit">Save credit</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="import-dialog" aria-labelledby="import-dialog-title">
+    <form id="import-form" novalidate>
+      <div class="dialog-head">
+        <div>
+          <h2 id="import-dialog-title">Import shop data</h2>
+          <p class="dialog-sub">Paste a JSON file in the sample format, or choose the file. Importing replaces what is on this device.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+
+      <div class="import-file-row">
+        <label class="btn ghost" for="import-file">Choose JSON file</label>
+        <input id="import-file" name="file" type="file" accept=".json,application/json" class="visually-hidden">
+        <span class="import-file-name" id="import-file-name">No file chosen</span>
+      </div>
+
+      <div class="field">
+        <label for="import-text">JSON</label>
+        <textarea id="import-text" name="text" rows="9" spellcheck="false" placeholder='{"shop": "Lakshmi Provision Store", "customers": [{"name": "Ravi Kumar", "phone": "9000000101"}], "entries": []}' aria-describedby="import-errors"></textarea>
+      </div>
+
+      <div class="form-error import-errors" id="import-errors" role="alert"></div>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary">Load data</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog dialog-image" id="image-dialog" aria-labelledby="image-dialog-title">
+    <div class="dialog-head">
+      <div>
+        <h2 id="image-dialog-title">Payment screenshot</h2>
+        <p class="dialog-sub" id="image-dialog-sub"></p>
+      </div>
+      <button type="button" class="icon-btn" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <img id="image-full" class="image-full" alt="" width="900" height="900">
+  </dialog>
+
+  <noscript>
+    <p class="wrap noscript">Hisaab needs JavaScript switched on to save your ledger in this browser.</p>
+  </noscript>
+
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
